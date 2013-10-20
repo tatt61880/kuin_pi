@@ -1,6 +1,6 @@
 {
-    pi.kn (for Kuin 0.031):
-        Last Modified: 2013/07/28 09:18:07.
+    pi.kn (for Kuin 1.00):
+        Last Modified: 2013/09/23 10:42:38.
         Created by @tatt61880
 
     下記のサイトを参考に作成しました。
@@ -13,10 +13,10 @@ func Main()
     var x: []byte32 :: #[@N]byte32
     var y: []byte32 :: #[@N]byte32
 
-    do @ATAN(x, 5)
+    do @Atan(x, 5)
     do @Mul(x, 4$ byte32)
 
-    do @ATAN(y, 239)
+    do @Atan(y, 239)
 
     do @Sub(x, y)
     do @Mul(x, 4$ byte32)
@@ -24,12 +24,12 @@ func Main()
     do @Display(x)
 end func
 
-func ATAN(x: []byte32, m: int)
-    var e: int :: -1
+func Atan(x: []byte32, m: int)
+    var e: int
     var m2: byte32
     var y: []byte32 :: #[@N]byte32
     var z: []byte32 :: #[@N]byte32
-    for i(0, @N-1)
+    for i(0, @N - 1)
         do x[i] :: 0$ byte32
         do y[i] :: 0$ byte32
     end for
@@ -37,12 +37,12 @@ func ATAN(x: []byte32, m: int)
 
     do @Div(y, m$ byte32)
     do @Dup(y, x)
-    do m2 :: (m*m)$ byte32
+    do m2 :: (m * m)$ byte32
     var i: int :: 1
-    while (e = -1)
+    while (e = -1, skip)
         do @Div(y, m2)
         do @Dup(y, z)
-        do @Div(z, (2*i+1)$ byte32)
+        do @Div(z, (2 * i + 1)$ byte32)
         if ((i$ byte32).And(1$ byte32) = 0$ byte32 )
             do @Add(x, z)
         else
@@ -56,13 +56,13 @@ end func
 func Add(a: []byte32, b: []byte32)
     var j: int
     var x: byte32
-    for i(0, @N-1)
+    for i(0, @N - 1)
         do x :: a[i] + b[i]
         if(x <= 16#ffff$ byte32)
             do a[i] :: x
         else
             do a[i] :: x.And(16#ffff$ byte32)
-            do j :: i-1
+            do j :: i - 1
             while(a[j] = 16#ffff$ byte32)
                 do a[j] :: 0$ byte32
                 do j :- 1
@@ -74,12 +74,12 @@ end func
 
 func Sub(a: []byte32, b: []byte32)
     var j: int
-    for i(0, @N-1)
+    for i(0, @N - 1)
         if (a[i] >= b[i])
             do a[i] :: a[i] - b[i]
         else
             do a[i] :: 16#10000$ byte32 + a[i] - b[i]
-            do j :: i-1
+            do j :: i - 1
             while(a[j] = 0$ byte32)
                 do a[j] :: 16#ffff$ byte32
                 do j :- 1
@@ -94,12 +94,12 @@ func Div(a: []byte32, d: byte32)
     var q: byte32
     var res: byte32
     do res :: 0$ byte32
-    for i(0, @N-1)
-        do res :* (2^16)$ byte32 {res = res << 16; シフト演算未実装}
+    for i(0, @N - 1)
+        do res :: res.Shl(16)
         do x :: a[i] + res
-        do q :: x/d
+        do q :: x / d
         do a[i] :: q
-        do res :: x - q*d
+        do res :: x - q * d
     end for
 end func
 
@@ -108,15 +108,15 @@ func Mul(a: []byte32, d: byte32)
     var x: byte32
     var q: byte32
     do q :: 0$ byte32
-    for i(@N-1, 0, -1)
-        do x :: a[i]*d + q
+    for i(@N - 1, 0, -1)
+        do x :: a[i] * d + q
         do a[i] :: x.And(16#ffff$ byte32)
-        do q :: x / (2^16)$ byte32 {q = x >> 16; シフト演算未実装}
+        do q :: x.Shr(16)
     end for
 end func
 
 func Dup(a: []byte32, b: []byte32)
-    for i(0, @N-1)
+    for i(0, @N - 1)
         do b[i] :: a[i]
     end for
 end func
@@ -124,7 +124,7 @@ end func
 func if_zero(a: []byte32): int
     var j: int
     do j :: 0
-    for i(0, @N-1)
+    for i(0, @N - 1)
         if (a[i] <> 0$ byte32)
             do j :: -1
             break i
@@ -138,26 +138,26 @@ func Display(a: []byte32)
     var w: []byte32 :: #[@M]byte32
     do @to_decimal(a, w)
     var str: []char :: ""
-    do str :~ (w[0]$ int).ToStrF("4d") ~ "." {printf("%4.1u.",w[0])}
-    for i(1, @M-1)
-        do str :~ (w[i]$ int).ToStrF("04d") ~ " " {printf("%4.4u ", w[i])}
-        do j :: i%12
+    do str :~ (w[0]$ int).ToStrF("4d") ~ "."
+    for i(1, @M - 1)
+        do str :~ (w[i]$ int).ToStrF("04d") ~ " "
+        do j :: i % 12
         if(j=0)
-            do str :~ "\n     " {printf("\n     ")}
+            do str :~ "\n     "
         end if
     end for
-    do str :~ "\n" {printf("\n")}
+    do str :~ "\n"
     do Dbg@Log(str)
 end func
 
 func to_decimal(a: []byte32, w: []byte32)
     var b: []byte32 :: #[@N]byte32
-    for i(0, @N-1)
+    for i(0, @N - 1)
         do b[i] :: a[i]
     end for
     do w[0] :: b[0]
     do b[0] :: 0$ byte32
-    for i(1, @M-1)
+    for i(1, @M - 1)
         do @Mul(b, 10000$ byte32)
         do w[i] :: b[0]
         do b[0] :: 0$ byte32
