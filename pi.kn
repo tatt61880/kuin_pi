@@ -1,11 +1,11 @@
-{
-pi.kn (for Kuin 1.01):
-Last Modified: 2014/02/16 01:07:15.
-Created by @tatt61880
+{{{
+	pi.kn (for Kuin 1.01):
+		Last Modified: 2014/02/16 01:10:31.
+		Created by @tatt61880
 
-下記のサイトを参考に作成しました。
-http://mail2.nara-edu.ac.jp/~asait/c_program/sample0/pi.htm
-}
+		下記のサイトを参考に作成しました。
+		http://mail2.nara-edu.ac.jp/~asait/c_program/sample0/pi.htm
+}}}
 const M: int :: 2502
 const N: int :: 2078
 
